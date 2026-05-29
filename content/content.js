@@ -2,48 +2,100 @@
   // Cross-browser shim: see background.js.
   globalThis.browser ||= globalThis.chrome;
 
-  // Guard against double-injection on extension reload, otherwise duplicate
-  // click handlers would fire and produce duplicate attachments.
+  // Guard against double-injection on extension reload.
   if (window.__IMMICH_CONTENT_LOADED__) return;
   window.__IMMICH_CONTENT_LOADED__ = true;
 
   const debug = () => !!window.__IMMICH_DEBUG__;
-  const log = (...a) => { if (debug()) console.log("[immich-attach]", ...a); };
-  const warn = (...a) => console.warn("[immich-attach]", ...a);
+  const log = (...a) => { if (debug()) console.log("[immich-proton]", ...a); };
+  const warn = (...a) => console.warn("[immich-proton]", ...a);
 
-  const BUTTON_MARK = "data-immich-attach-injected";
-  const BRIDGE_TAG = "__IMMICH_ATTACH__";
-  const PAPERCLIP_SELECTOR =
-    '[aria-label="Attach files"], [data-tooltip="Attach files"], [command="Files"]';
+  const BUTTON_MARK = "data-immich-proton-injected";
+  const PICKER_SOURCE = "immich-picker";
 
   let pickerFrame = null;
   let pickerOverlay = null;
   let pickerTargetCompose = null;
 
-  // Anchor on the "Attach files" paperclip rather than the dialog wrapper —
-  // inline replies in a conversation thread are not wrapped in a role=dialog,
-  // but every compose toolbar (popup or inline) has its own paperclip.
-  function findComposeAnchors() {
-    return Array.from(document.querySelectorAll(PAPERCLIP_SELECTOR));
-  }
+  // ── Proton Mail Composer Detection ──────────────────────────────
+  //
+  // Proton's web client is a React SPA. The composer is a floating
+  // panel (ComposerFrame) that contains:
+  //   - An action bar with buttons (send, attach, formatting, etc.)
+  //   - A content/editable area wrapped in a Dropzone
+  //
+  // We use resilient attribute/class selectors that match Proton's
+  // current DOM structure. These can be refined after testing against
+  // the live site.
 
-  // Walk up from the paperclip until we find an ancestor that also contains the
-  // editor textbox — that's the smallest element that scopes a single compose.
-  function composeContainerFor(paperclip) {
-    let el = paperclip.parentElement;
-    while (el && el !== document.body) {
-      if (el.querySelector('div[contenteditable="true"][role="textbox"]')) {
-        return el;
+  // Find all composer containers currently in the DOM.
+  // Proton composers are prominent elements — we look for the
+  // composer frame/panel by its structural role.
+  function findComposers() {
+    // Strategy: find elements that contain both an attachment-like
+    // button area and a contenteditable editor. Proton's composer
+    // is typically a top-level floating element.
+    const candidates = [];
+
+    // Primary: look for Proton's composer container class patterns
+    const byClass = document.querySelectorAll(
+      '[class*="composer"], [class*="Composer"]'
+    );
+    for (const el of byClass) {
+      // Must have a contenteditable area (the email body editor)
+      if (el.querySelector('[contenteditable="true"]')) {
+        candidates.push(el);
       }
-      el = el.parentElement;
     }
-    return null;
+
+    // Fallback: any element containing a proton-style compose editor
+    // that isn't already captured
+    if (candidates.length === 0) {
+      const editors = document.querySelectorAll(
+        '.proton-editor [contenteditable="true"], ' +
+        '[data-testid*="composer"] [contenteditable="true"]'
+      );
+      for (const ed of editors) {
+        // Walk up to find the composer container
+        let container = ed.closest('[class*="composer"]') || ed.parentElement;
+        if (container && !candidates.includes(container)) {
+          candidates.push(container);
+        }
+      }
+    }
+
+    return candidates;
   }
 
-  function injectButton(paperclip) {
-    if (paperclip.getAttribute(BUTTON_MARK)) return;
-    const compose = composeContainerFor(paperclip);
-    if (!compose) return;
+  // Find the action bar within a composer (where we inject our button).
+  // This is typically where the Attach, Send, and other action buttons live.
+  function findActionBar(composer) {
+    // Look for the toolbar/action area inside the composer
+    // Proton usually has a button row at the bottom or top of the composer
+    return (
+      composer.querySelector('[class*="toolbar"], [class*="Toolbar"]') ||
+      composer.querySelector('[class*="composer-actions"], [class*="composerFooter"]') ||
+      composer.querySelector('footer, [role="toolbar"]') ||
+      // Very fallback: insert near the end of the composer
+      composer
+    );
+  }
+
+  // Check if we've already injected into this composer
+  function alreadyInjected(composer) {
+    return composer.hasAttribute(BUTTON_MARK);
+  }
+
+  // ── Button Injection ────────────────────────────────────────────
+
+  function injectButton(composer) {
+    if (alreadyInjected(composer)) return;
+
+    const actionBar = findActionBar(composer);
+    if (!actionBar) {
+      warn("found composer but no action bar", composer);
+      return;
+    }
 
     const btn = document.createElement("button");
     btn.type = "button";
@@ -58,19 +110,17 @@
       openPicker(compose);
     });
 
-    if (paperclip.parentNode) {
-      paperclip.parentNode.insertBefore(btn, paperclip.nextSibling);
-    } else {
-      btn.classList.add("immich-attach-floating");
-      compose.appendChild(btn);
-    }
-
-    paperclip.setAttribute(BUTTON_MARK, "1");
+    // Append to the action bar
+    actionBar.appendChild(btn);
+    composer.setAttribute(BUTTON_MARK, "1");
+    log("injected button into composer");
   }
 
-  function scanCompose() {
-    for (const p of findComposeAnchors()) injectButton(p);
+  function scanComposers() {
+    for (const c of findComposers()) injectButton(c);
   }
+
+  // ── Picker UI ───────────────────────────────────────────────────
 
   function openPicker(compose) {
     pickerTargetCompose = compose;
@@ -100,8 +150,10 @@
     pickerTargetCompose = null;
   }
 
+  // ── Message Handling (from picker iframe) ─────────────────────
+
   window.addEventListener("message", async (event) => {
-    if (!event.data || event.data.source !== "immich-picker") return;
+    if (!event.data || event.data.source !== PICKER_SOURCE) return;
     if (event.data.type === "close") {
       closePicker();
       return;
@@ -116,9 +168,8 @@
     }
   });
 
-  // Re-encode an image via OffscreenCanvas: downscale longest side to 1920px
-  // (only if larger) and drop EXIF/GPS/camera metadata as a side effect of the
-  // re-encode. HEIC/HEIF/RAW that Firefox can't decode falls back to original.
+  // ── Image Processing ───────────────────────────────────────────
+
   async function processImage(buffer, mime, filename, opts) {
     if (!opts.shrink) return null;
     let bitmap;
@@ -152,8 +203,18 @@
     return bytes.buffer;
   }
 
+  // ── Attachment Injection via Synthetic Drop Event ──────────────
+  //
+  // Proton Mail's composer uses a Dropzone component that listens
+  // for drag-and-drop events on the content area. It checks:
+  //   event.dataTransfer?.types?.includes('Files')
+  // It does NOT check event.isTrusted, so synthetic events work.
+  //
+  // We create File objects from fetched Immich data, build a
+  // DataTransfer, and dispatch a drop event sequence.
+
   async function attachAssetsToCompose(compose, assetIds, options) {
-    log("attaching", assetIds.length, "asset(s)", "opts:", options);
+    log("attaching", assetIds.length, "asset(s), opts:", options);
     const files = [];
     for (const id of assetIds) {
       const resp = await browser.runtime.sendMessage({
@@ -182,22 +243,56 @@
       return;
     }
 
-    const dropTarget = compose.querySelector('div[contenteditable="true"][role="textbox"]') || compose;
-    const buffers = files.map((f) => f.buffer);
-    const meta = files.map((f) => ({ name: f.filename, type: f.mime || "application/octet-stream" }));
-
-    dropTarget.setAttribute("data-immich-drop-target", "1");
-
-    log("posting to bridge:", meta.length, "files");
-    window.postMessage(
-      { [BRIDGE_TAG]: true, type: "attach", meta, buffers },
-      window.location.origin
+    // Build File objects from the fetched data
+    const fileObjects = files.map((f) =>
+      new File([f.buffer], f.filename, { type: f.mime || "application/octet-stream" })
     );
 
-    setTimeout(() => dropTarget.removeAttribute("data-immich-drop-target"), 1000);
+    // Find the drop target — the composer's content/editable area
+    // where Proton's Dropzone listener is attached
+    const dropTarget =
+      compose.querySelector('[contenteditable="true"]') ||
+      compose.querySelector('[class*="dropzone"], [class*="Dropzone"]') ||
+      compose;
+
+    log("dispatching drop on", dropTarget.className || dropTarget.tagName,
+        "with", fileObjects.length, "file(s)");
+
+    // Create DataTransfer with our files
+    const dt = new DataTransfer();
+    for (const f of fileObjects) dt.items.add(f);
+
+    // Dispatch the full drag event sequence that Proton's Dropzone expects
+    const dragEnterEvt = new DragEvent("dragenter", {
+      dataTransfer: dt,
+      bubbles: true,
+      cancelable: true,
+    });
+    const dragOverEvt = new DragEvent("dragover", {
+      dataTransfer: dt,
+      bubbles: true,
+      cancelable: true,
+    });
+    const dropEvt = new DragEvent("drop", {
+      dataTransfer: dt,
+      bubbles: true,
+      cancelable: true,
+    });
+
+    dropTarget.dispatchEvent(dragEnterEvt);
+    dropTarget.dispatchEvent(dragOverEvt);
+    dropTarget.dispatchEvent(dropEvt);
+
+    log("drop dispatched successfully");
   }
 
-  const obs = new MutationObserver(() => scanCompose());
+  // ── DOM Observation ────────────────────────────────────────────
+
+  const obs = new MutationObserver(() => scanComposers());
   obs.observe(document.body, { childList: true, subtree: true });
-  scanCompose();
+
+  // Initial scan + delayed retry (Proton's SPA may load composers late)
+  scanComposers();
+  setTimeout(scanComposers, 2000);
+  setTimeout(scanComposers, 5000);
 })();

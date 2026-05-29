@@ -1,144 +1,94 @@
-# Immich Photos for Gmail
+# Immich Photos for Proton Mail 🔐📸
 
-<p align="center">
-  <img src="icons/source/social-card.png" alt="Immich Photos for Gmail" width="640" />
-</p>
+> Attach photos from your self-hosted [Immich](https://immich.app/) library directly into **Proton Mail** compose windows.
 
-[![Ko-fi](https://img.shields.io/badge/Support-Ko--fi-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/richard1912)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Firefox](https://img.shields.io/badge/Firefox-128%2B-FF7139?logo=firefox-browser&logoColor=white)](https://www.mozilla.org/firefox/)
-[![Chrome](https://img.shields.io/badge/Chrome-MV3-4285F4?logo=google-chrome&logoColor=white)](https://www.google.com/chrome/)
+A browser extension (Firefox / Chrome / Edge) that injects an Immich button into Proton Mail's composer, letting you browse your photo library, search, pick albums, and attach — all without leaving your email draft.
 
-A browser extension that lets you attach photos from your self-hosted [Immich](https://immich.app) library directly to Gmail emails. No more download, then re-upload round trip. Works in **Firefox** and **Chrome / Edge**.
+![Screenshot placeholder](assets/upload-screen.png)
 
-<p align="center">
-  <em>Recent, Search, Albums. Pick photos in two clicks. Attached as native Gmail files.</em>
-</p>
+## Why?
+
+You self-host your photos on Immich for privacy. You use Proton Mail for encrypted email. But when you want to share photos via email, the workflow is:
+
+1. Open Immich → find photo → download
+2. Switch to Proton Mail → compose → attach downloaded file
+3. Repeat for every photo
+
+This extension eliminates that round-trip. Pick photos from Immich directly inside Proton Mail's compose window.
 
 ## Features
 
-<p align="center">
-  <img src="assets/new-email.jpg" alt="The Immich button injected into the Gmail compose toolbar" width="640" />
-  <br />
-  <em>The Immich button sits inline in the Gmail compose action toolbar.</em>
-</p>
+- 🎨 **Full Immich picker** — Recent timeline, smart search, album browser
+- 📎 **Native attachments** — Photos appear as real Proton Mail encrypted attachments
+- ✂️ **Optional resize & strip metadata** — Downscale to 1920px, drop EXIF/GPS
+- 🔒 **Local-only credentials** — Your Immich URL & API key stay in `browser.storage.local`
+- 🌐 **Cross-browser** — Firefox, Chrome, Edge (Manifest V3)
 
-<p align="center">
-  <img src="assets/upload-screen.png" alt="The Immich picker showing the Recent tab with a thumbnail grid" width="780" />
-  <br />
-  <em>The picker. Recent, Search, Albums tabs. Multi-select. Optional resize and strip-metadata toggle in the footer.</em>
-</p>
-
-<p align="center">
-  <img src="assets/albums.png" alt="The Immich picker Albums tab with a live filter input and a grid of square album cards" width="780" />
-  <br />
-  <em>Albums tab with a live filter and a square-card grid. Each card shows the album cover, name, and item count.</em>
-</p>
-
-- **Adds an "Immich" button** to the Gmail compose toolbar.
-- **Picker overlay** with three tabs:
-  - **Recent**: your timeline, infinite-scrolled.
-  - **Search**: full-text search ("beach 2024", "Alice", "snow").
-  - **Albums**: browse your existing albums.
-- **Real attachments**: files land in the draft as native Gmail attachment chips, exactly like clicking the paperclip.
-- **Optional resize + strip metadata**: single checkbox in the picker footer downscales the longest side to 1920px and re-encodes as JPEG, dropping EXIF / GPS / camera tags.
-- **Local-only**: your API key is stored in `browser.storage.local`, never sent anywhere except your own Immich server.
-
-## Install
+## Installation
 
 ### Firefox
 
-> Mozilla AMO listing pending. For now, the extension is distributed as a signed `.xpi` via GitHub Releases.
-
-1. Download the latest `immich-photos-for-gmail-X.Y.Z.xpi` from the [Releases page](https://github.com/richard1912/immich-photos-for-gmail/releases).
-2. Open Firefox → `about:addons`.
-3. Drag the `.xpi` onto the page (or click the gear icon → **Install Add-on From File…**).
-4. Approve the permission prompt for `mail.google.com`.
+1. Download the latest `.xpi` from [Releases](https://github.com/immich-photos-for-proton/immich-photos-for-proton/releases)
+2. Open `about:addons` → drag the `.xpi` onto the page
+3. Approve permission prompt for `mail.proton.me`
 
 ### Chrome / Edge
 
-> Chrome Web Store listing pending. For now, load as an unpacked extension.
-
-1. Download `immich-photos-for-gmail-X.Y.Z-chrome.zip` from the [Releases page](https://github.com/richard1912/immich-photos-for-gmail/releases) and unzip it (or [build from source](#chrome--edge-build)).
-2. Open `chrome://extensions` (or `edge://extensions`) and enable **Developer mode**.
-3. Click **Load unpacked** and select the unzipped folder.
-4. Approve the permission prompt for `mail.google.com`.
-
-The settings page will open automatically on first install.
+1. Download `immich-photos-for-proton-chrome.zip` from [Releases](https://github.com/immich-photos-for-proton/immich-photos-for-proton/releases)
+2. Unzip it
+3. Open `chrome://extensions` (or `edge://extensions`) → enable **Developer mode**
+4. Click **Load unpacked** → select the unzipped folder
+5. Approve permission prompt
 
 ## Setup
 
-1. In Immich → click your profile → **Account Settings** → **API Keys** → **New API Key**.
-2. Tick these permissions (or just **all**): `asset.read`, `asset.download`, `asset.view`, `album.read`, `albumAsset.read`, `search.read`. Copy the generated key.
-3. In the extension settings tab:
-   - **Immich base URL**: e.g. `https://immich.example.com` (no trailing slash).
-   - **API key**: paste the key.
-4. Click **Save & Connect**. The browser will request permission to access your Immich origin; accept it. The extension verifies the credentials by hitting `/api/users/me`.
-5. Open Gmail → click **Compose** → an **Immich** button appears next to the paperclip.
+1. In your Immich instance: **Account Settings** → **API Keys** → **New API Key**
+2. Grant permissions: `asset.read`, `asset.download`, `asset.view`, `album.read`, `albumAsset.read`, `search.read`
+3. In extension settings:
+   - **Immich base URL**: e.g. `https://immich.example.com` (no trailing slash)
+   - **API key**: Paste the generated key
+4. Click **Save & Connect**
 
-## Usage
+Open any Proton Mail compose window — the **Immich** button appears in the action bar.
 
-1. In a Gmail compose window, click **Immich**.
-2. Browse / search / pick photos. Click thumbnails to multi-select.
-3. (Optional) Tick **"Resize to 1080p & strip metadata"** in the footer if you want smaller / private-friendlier attachments.
-4. Click **Attach (N)**. Files appear as normal attachment chips in the compose window.
+## How It Works
+
+Based on the excellent [immich-photos-for-gmail](https://github.com/richard1912/immich-photos-for-gmail) by [richard1912](https://github.com/richard1912), adapted for Proton Mail's composer architecture.
+
+Key differences from the Gmail version:
+
+| | Gmail Version | Proton Version |
+|---|---|---|
+| **Attachment method** | File input manipulation via MAIN world script bridge | Synthetic drag-and-drop events on composer Dropzone |
+| **Target domain** | `mail.google.com` | `mail.proton.me` |
+| **Encryption** | Gmail handles TLS in transit | Proton encrypts attachments client-side before upload |
+| **Content script world** | ISOLATED + MAIN (for file input access) | ISOLATED only (drop events don't require MAIN world) |
+
+Proton Mail's composer uses a React-based Dropzone component that accepts file drops. The extension creates `File` objects from fetched Immich data, builds a `DataTransfer`, and dispatches synthetic `dragenter`/`dragover`/`drop` events. Proton's handler picks them up, encrypts client-side with OpenPGP, and uploads normally.
 
 ## Privacy
 
-- Your Immich URL and API key are stored locally via `browser.storage.local` and only sent to your Immich server.
-- No telemetry, no analytics, no third-party servers.
-- The extension only runs on `https://mail.google.com/*` and the Immich origin you configure.
+- Your Immich URL and API key are stored exclusively in `browser.storage.local`
+- Only transmitted to your self-hosted Immich server
+- No telemetry, analytics, or third-party data transmission
+- Extension only runs on `https://mail.proton.me/*` and your configured Immich origin
 
-See [PRIVACY.md](PRIVACY.md) for details.
-
-## Building from source
-
-```bash
-git clone https://github.com/richard1912/immich-photos-for-gmail.git
-cd immich-photos-for-gmail
-# Pack a development XPI (just a zip of the directory):
-zip -r immich-photos-for-gmail.xpi . -x "*.git*" "icons/source/*" "*.md" "LICENSE"
-```
-
-To install the unsigned development build, you need [Firefox Developer Edition](https://www.mozilla.org/firefox/developer/) or [Nightly](https://www.mozilla.org/firefox/channel/desktop/#nightly) and set `xpinstall.signatures.required` to `false` in `about:config`.
-
-For a signed build that installs in stock Firefox, use [`web-ext sign`](https://extensionworkshop.com/documentation/develop/web-ext-command-reference/#sign) with your Mozilla AMO API credentials.
-
-### Chrome / Edge build
+## Development
 
 ```bash
-python scripts/build_chrome.py
+git clone https://github.com/immich-photos-for-proton/immich-photos-for-proton.git
+cd immich-photos-for-proton
+# Firefox dev build (unsigned):
+zip -r immich-photos-for-proton.xpi . -x "*.git*" "icons/source/*" "*.md" "LICENSE"
+# Load unsigned XPI in Firefox Developer Edition / Nightly
 ```
 
-This produces `web-ext-artifacts/immich-photos-for-gmail-X.Y.Z-chrome.zip` and an unpacked staging directory at `web-ext-artifacts/chrome/`. To load it:
+## Acknowledgments
 
-1. Open `chrome://extensions` (or `edge://extensions`).
-2. Enable **Developer mode**.
-3. Click **Load unpacked** and select `web-ext-artifacts/chrome/`.
-
-The Chrome build uses `manifest.chrome.json` as its source-of-truth manifest. The same `.js` / `.css` / `.html` files are reused — a small `globalThis.browser ||= globalThis.chrome` shim at the top of each script makes them work in both browsers.
-
-## Compatibility
-
-- **Firefox 128+** (Manifest V3 with `optional_host_permissions` and `world: "MAIN"` content scripts).
-- **Chrome / Edge** via a separate build (see [Building from source](#building-from-source)). The Chrome build uses the same source files with a service-worker manifest and is loaded as an unpacked extension.
-- Tested on the modern Gmail UI (`mail.google.com`).
-
-## Limitations
-
-- HEIC / HEIF / RAW originals can't be re-encoded by the browser's `createImageBitmap`. With the resize option on, those files are sent as their original bytes.
-- Gmail's 25MB attachment ceiling still applies. Large originals will be rejected by Gmail (the chip will appear, then disappear with an error). Use the resize option for big photos.
-
-## Support development
-
-This extension is free and open source. If it saves you time, you can buy me a coffee:
-
-<p>
-  <a href="https://ko-fi.com/richard1912">
-    <img src="https://storage.ko-fi.com/cdn/kofi3.png?v=3" alt="Buy me a coffee on Ko-fi" height="42" />
-  </a>
-</p>
+- Forked from [richard1912/immich-photos-for-gmail](https://github.com/richard1912/immich-photos-for-gmail) — the original Gmail extension, MIT licensed
+- [Immich](https://immich.app/) — incredible self-hosted photo management
+- [Proton Mail](https://proton.me/mail) — open-source encrypted email ([WebClients repo](https://github.com/ProtonMail/WebClients))
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).

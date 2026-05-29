@@ -73,7 +73,7 @@ $("save").addEventListener("click", async () => {
   let granted;
   try {
     granted = await browser.permissions.request({
-      origins: [origin, "https://mail.google.com/*"],
+      origins: [origin, "https://mail.proton.me/*"],
     });
   } catch (e) {
     setStatus("Permission request failed: " + (e.message || e), "err");

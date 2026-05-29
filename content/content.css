@@ -1,52 +1,50 @@
+/* ── Immich button styled for Proton Mail's dark/light theme ── */
+
 .immich-attach-btn {
   display: inline-flex;
   align-items: center;
   align-self: center;
   box-sizing: border-box;
-  gap: 4px;
-  /* Negative left margin pulls the button tight against the paperclip;
-     Gmail's paperclip wrapper has its own right-side spacing that we can
-     only counter from this side. Right margin keeps natural breathing
-     room from the link icon. */
-  margin: 0 4px 0 -12px;
-  padding: 0 10px;
-  border: 1px solid #dadce0;
-  border-radius: 14px;
-  background: #ffffff;
-  color: #1a73e8;
-  font-family: "Google Sans", Roboto, Arial, sans-serif;
-  font-size: 12px;
-  font-weight: 600;
+  gap: 5px;
+  margin: 2px 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--border-norm, #d0d0d0);
+  border-radius: 8px;
+  background: var(--background-norm, #ffffff);
+  color: var(--primary-norm, #6d4c41);
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "SFMono-Regular", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
-  height: 28px;
-  line-height: 1;
+  height: auto;
+  line-height: 1.2;
   vertical-align: middle;
   white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
 }
 
 .immich-attach-btn:hover {
-  background: #f1f3f4;
-  border-color: #c4c7c8;
+  background: var(--background-weak, #f3f3f3);
+  border-color: var(--interaction-norm, #bbbbbb);
 }
 
 .immich-attach-btn:active {
-  background: #e8eaed;
+  background: var(--background-strong, #e8e8e8);
 }
 
 .immich-attach-icon {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   display: inline-block;
   flex-shrink: 0;
   vertical-align: middle;
 }
 
-.immich-attach-floating {
-  position: absolute;
-  right: 12px;
-  bottom: 56px;
-  z-index: 5;
+.immich-attach-label {
+  font-weight: 600;
 }
+
+/* ── Picker overlay (same as Gmail version) ── */
 
 .immich-picker-overlay {
   position: fixed;

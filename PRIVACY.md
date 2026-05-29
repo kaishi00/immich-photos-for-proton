@@ -1,35 +1,35 @@
-# Privacy Policy
+# Privacy Policy — Immich Photos for Proton Mail
 
-**Immich Photos for Gmail** is a browser extension (Firefox and Chrome / Edge). It does not have any backend servers and does not collect any data about you.
+**Immich Photos for Proton Mail** is a browser extension (Firefox and Chrome / Edge). It does not have any backend servers and does not collect any data about you.
 
-## What data is stored
+## What data the extension accesses
 
-The extension stores three small pieces of data in your browser, via `browser.storage.local`:
+- **To `mail.proton.me`**: the extension injects a button into Proton Mail's compose UI and reads the compose dialog's DOM in order to add the selected files as attachments via synthetic drag-and-drop events. No email content is sent anywhere outside your browser.
+- **To your self-hosted Immich instance**: the extension sends HTTP requests with your API key to browse your photo library and download selected photos. These requests go directly from your browser to your Immich server.
+- Any address other than the Immich URL you configured and `mail.proton.me`
 
-1. **`baseUrl`**: the Immich URL you enter on the settings page (e.g. `https://immich.example.com`).
-2. **`apiKey`**: the API key you generate inside your Immich account.
-3. **`attachOpts`**: the on/off state of the "Resize to 1080p & strip metadata" checkbox.
+## Where data is stored
 
-These values stay on your device. They are not synced to any server, are not transmitted anywhere by the extension, and are removed when you uninstall the extension.
+| Data | Storage | Sent to |
+|------|---------|---------|
+| Immich base URL | `browser.storage.local` | Nowhere |
+| Immich API key | `browser.storage.local` | Your Immich server only |
+| Downloaded photo bytes | Memory only (during attach) | Nowhere |
 
-## What network requests the extension makes
+## Permissions breakdown
 
-- **To your Immich server only**: the extension calls the Immich REST API (`/api/search/metadata`, `/api/assets/{id}/thumbnail`, `/api/assets/{id}/original`, `/api/albums`, `/api/users/me`, etc.) using the API key you configured. These requests are sent only to the URL you entered in the settings page.
-- **To `mail.google.com`**: the extension injects a button into Gmail's compose UI and reads the compose dialog's DOM in order to add the selected files as attachments. No Gmail content is sent anywhere outside your browser.
-
-The extension does **not** make any requests to:
-- The author's servers
-- Mozilla, Google, or any third-party telemetry / analytics service
-- Any address other than the Immich URL you configured and `mail.google.com`
-
-## Permissions explained
-
-| Permission | Why |
+| Permission / Origin | Purpose |
 |---|---|
-| `storage` | Save your Immich URL, API key, and toggle preferences locally. |
-| `https://mail.google.com/*` (host) | Inject the **Immich** button into the Gmail compose toolbar and place selected files into the compose dialog. |
-| `https://*/*` (optional host) | Talk to the user-configured Immich server. The extension only ever requests the specific origin you typed into the settings page; it does not pre-grant access to "all sites". |
+| `storage` | Save your Immich URL + API key locally |
+| `https://mail.proton.me/*` (host) | Inject the **Immich** button into the Proton Mail composer toolbar and dispatch drop events with selected files into the composer. |
+| `https://<your-immich>/*` (optional, granted on setup) | Fetch photos, thumbnails, albums, and search results from your Immich instance. |
 
-## Contact
+## Third-party code
 
-For questions or concerns, open an issue at <https://github.com/richard1912/immich-photos-for-gmail/issues>.
+None. The extension contains no analytics, tracking, advertising, or CDN-loaded scripts.
+
+## Source code
+
+Full source available at: https://github.com/immich-photos-for-proton/immich-photos-for-proton
+
+For questions or concerns, open an issue at <https://github.com/immich-photos-for-proton/immich-photos-for-proton/issues>.

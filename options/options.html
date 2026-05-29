@@ -2,60 +2,63 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Immich Photos for Gmail: Settings</title>
+  <title>Immich Photos for Proton Mail: Settings</title>
   <style>
     body {
-      font-family: "Google Sans", Roboto, Arial, sans-serif;
-      padding: 14px 16px;
-      width: 380px;
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "SFMono-Regular", sans-serif;
+      padding: 16px 20px;
+      width: 400px;
       max-width: 100%;
-      color: #202124;
-      line-height: 1.4;
+      color: var(--text-norm, #333);
+      line-height: 1.5;
       margin: 0;
     }
-    h1 { font-size: 17px; margin: 0 0 2px; }
-    .sub { color: #5f6368; font-size: 12px; margin-bottom: 12px; }
-    label { display: block; font-size: 13px; font-weight: 500; margin: 10px 0 4px; }
+    h1 { font-size: 18px; margin: 0 0 2px; color: var(--text-norm, #1a1a1a); }
+    .sub { color: var(--text-hint, #6f6f6f); font-size: 13px; margin-bottom: 14px; }
+    label { display: block; font-size: 13px; font-weight: 600; margin: 12px 0 4px; color: var(--text-norm, #333); }
     input[type="text"], input[type="password"] {
       width: 100%;
-      padding: 8px 10px;
-      border: 1px solid #dadce0;
+      padding: 9px 11px;
+      border: 1px solid var(--border-norm, #c4c9cb);
       border-radius: 8px;
       font-size: 13px;
       box-sizing: border-box;
       font-family: inherit;
+      background: var(--field-norm, #fff);
+      color: var(--text-norm, #333);
     }
-    input:focus { border-color: #1a73e8; outline: none; }
-    .row { display: flex; gap: 10px; margin-top: 14px; align-items: center; flex-wrap: wrap; }
+    input:focus { border-color: var(--interaction-norm, #6d4c41); outline: none; box-shadow: 0 0 0 2px rgba(109, 76, 65, 0.15); }
+    .row { display: flex; gap: 10px; margin-top: 16px; align-items: center; flex-wrap: wrap; }
     button {
-      padding: 8px 16px;
+      padding: 9px 18px;
       border: 0;
-      background: #1a73e8;
+      background: var(--primary-norm, #6d4c41);
       color: #fff;
       border-radius: 8px;
       cursor: pointer;
-      font-weight: 500;
+      font-weight: 600;
       font-size: 13px;
+      transition: background 0.15s;
     }
-    button:hover { background: #1765cc; }
+    button:hover { background: var(--primary-strong, #573d34); }
     .status { font-size: 12px; }
-    .status.ok { color: #1e8e3e; }
-    .status.err { color: #c5221f; }
-    .hint { font-size: 11px; color: #5f6368; margin-top: 4px; }
+    .status.ok { color: var(--signal-success, #1e8e3e); }
+    .status.err { color: var(--signal-danger, #c5221f); }
+    .hint { font-size: 11.5px; color: var(--text-hint, #6f6f6f); margin-top: 4px; }
     .help {
-      margin-top: 14px;
-      padding: 10px 12px;
-      background: #f8f9fa;
+      margin-top: 16px;
+      padding: 10px 14px;
+      background: var(--background-weak, #f3f3f3);
       border-radius: 8px;
       font-size: 12px;
-      color: #3c4043;
+      color: var(--text-norm, #3c4043);
     }
     .help > summary {
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
       list-style: none;
-      color: #1a73e8;
+      color: var(--interaction-norm, #6d4c41);
     }
     .help > summary::-webkit-details-marker { display: none; }
     .help > summary::before {
@@ -65,41 +68,28 @@
     }
     .help[open] > summary::before { content: "▾ "; }
     .help ol { margin: 8px 0 0; padding-left: 20px; }
-    .help li { margin-bottom: 2px; }
+    .help li { margin-bottom: 3px; }
     code {
-      background: #e8eaed;
-      padding: 1px 6px;
+      background: var(--background-strong, #e8e8e8);
+      padding: 2px 6px;
       border-radius: 4px;
       font-size: 12px;
     }
     .footer-links {
-      margin-top: 14px;
+      margin-top: 16px;
       padding-top: 10px;
-      border-top: 1px solid #e8eaed;
+      border-top: 1px solid var(--border-norm, #e8e8e8);
       display: flex;
       gap: 14px;
       align-items: center;
       font-size: 11px;
-      color: #5f6368;
+      color: var(--text-hint, #6f6f6f);
     }
     .footer-links a {
-      color: #5f6368;
+      color: var(--interaction-norm, #6d4c41);
       text-decoration: none;
     }
-    .footer-links a:hover { color: #1a73e8; }
-    .kofi-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 10px;
-      background: #FF5E5B;
-      color: #fff !important;
-      border-radius: 16px;
-      font-weight: 500;
-      font-size: 11px;
-    }
-    .kofi-btn:hover { background: #e0524f; color: #fff !important; }
-    .footer-links .spacer { flex: 1; }
+    .footer-links a:hover { text-decoration: underline; }
     .header { display: flex; align-items: center; gap: 10px; margin-bottom: 2px; }
     .header img { width: 28px; height: 28px; flex: 0 0 auto; }
     .header h1 { margin: 0; }
@@ -108,12 +98,12 @@
 <body>
   <div class="header">
     <img src="../icons/icon-128.png" alt="" />
-    <h1>Immich Photos for Gmail</h1>
+    <h1>Immich Photos for Proton Mail</h1>
   </div>
-  <div class="sub">Connect your self-hosted Immich library so you can attach photos directly from Gmail compose.</div>
+  <div class="sub">Connect your self-hosted Immich library so you can attach photos directly from Proton Mail compose.</div>
 
   <label for="baseUrl">Immich base URL</label>
-  <input type="text" id="baseUrl" placeholder="https://demo.immich.app" autocomplete="off" />
+  <input type="text" id="baseUrl" placeholder="https://immich.example.com" autocomplete="off" />
   <div class="hint">The HTTPS URL of your Immich instance, no trailing slash.</div>
 
   <label for="apiKey">API key</label>
@@ -141,12 +131,8 @@
   </details>
 
   <div class="footer-links">
-    <a href="https://github.com/richard1912/immich-photos-for-gmail" target="_blank" rel="noopener">GitHub</a>
-    <a href="https://github.com/richard1912/immich-photos-for-gmail/issues" target="_blank" rel="noopener">Report a bug</a>
-    <span class="spacer"></span>
-    <a class="kofi-btn" href="https://ko-fi.com/richard1912" target="_blank" rel="noopener" title="Support development">
-      <span>&#9749;</span><span>Buy me a coffee</span>
-    </a>
+    <a href="https://github.com/immich-photos-for-proton/immich-photos-for-proton" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://github.com/immich-photos-for-proton/immich-photos-for-proton/issues" target="_blank" rel="noopener">Report a bug</a>
   </div>
 </body>
 <script src="options.js"></script>
