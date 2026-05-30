@@ -21,7 +21,6 @@ STAGE_DIR = OUT_DIR / "chrome"
 # manifest is written as `manifest.json` inside the zip.
 INCLUDE = [
     "background.js",
-    "page-bridge.js",
     "content/content.js",
     "content/content.css",
     "picker/picker.html",

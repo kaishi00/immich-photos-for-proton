@@ -136,6 +136,14 @@
 
   // ── Picker UI ───────────────────────────────────────────────────
 
+  function isDarkMode() {
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) return true;
+    const bg = getComputedStyle(document.body).backgroundColor;
+    const m = bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    if (m) return (m[1]*0.299 + m[2]*0.587 + m[3]*0.114) < 128;
+    return false;
+  }
+
   function openPicker(compose) {
     pickerTargetCompose = compose;
     if (pickerFrame) closePicker();
@@ -148,7 +156,8 @@
 
     pickerFrame = document.createElement("iframe");
     pickerFrame.className = "immich-picker-frame";
-    pickerFrame.src = browser.runtime.getURL("picker/picker.html");
+    const theme = isDarkMode() ? "dark" : "light";
+    pickerFrame.src = browser.runtime.getURL("picker/picker.html") + "?theme=" + theme;
     pickerFrame.allow = "fullscreen";
 
     pickerOverlay.appendChild(pickerFrame);

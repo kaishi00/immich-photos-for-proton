@@ -6,3 +6,10 @@ window.addEventListener('error', function(e) {
     e.preventDefault();
   }
 });
+
+// Apply theme from URL parameter
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const theme = params.get('theme');
+  if (theme) document.documentElement.setAttribute('data-theme', theme);
+})();
