@@ -66,8 +66,11 @@ function initPicker() {
   };
 
   try {
-    const v = browser.runtime.getManifest().version;
-    if (els.version) els.version.textContent = `v${v}`;
+    // Read version from data attribute set by suppress-resize-observer.js
+    // (passed via URL param since browser.runtime may not be available in iframe)
+    const v = document.documentElement.getAttribute('data-version')
+      || (typeof browser !== 'undefined' && browser.runtime && browser.runtime.getManifest && browser.runtime.getManifest().version);
+    if (v && els.version) els.version.textContent = `v${v}`;
   } catch (_) {}
 
   // Persist toggle state across sessions.

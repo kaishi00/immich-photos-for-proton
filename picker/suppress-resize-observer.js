@@ -7,9 +7,12 @@ window.addEventListener('error', function(e) {
   }
 });
 
-// Apply theme from URL parameter
+// Apply theme and version from URL parameters (passed by content script,
+// since browser.runtime may not be available in web-accessible iframe)
 (function() {
   const params = new URLSearchParams(window.location.search);
   const theme = params.get('theme');
   if (theme) document.documentElement.setAttribute('data-theme', theme);
+  const v = params.get('v');
+  if (v) document.documentElement.setAttribute('data-version', v);
 })();

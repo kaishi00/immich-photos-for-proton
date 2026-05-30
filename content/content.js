@@ -157,7 +157,8 @@
     pickerFrame = document.createElement("iframe");
     pickerFrame.className = "immich-picker-frame";
     const theme = isDarkMode() ? "dark" : "light";
-    pickerFrame.src = browser.runtime.getURL("picker/picker.html") + "?theme=" + theme;
+    const version = browser.runtime.getManifest().version;
+    pickerFrame.src = browser.runtime.getURL("picker/picker.html") + "?theme=" + theme + "&v=" + encodeURIComponent(version);
     pickerFrame.allow = "fullscreen";
 
     pickerOverlay.appendChild(pickerFrame);
