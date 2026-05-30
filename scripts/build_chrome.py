@@ -27,6 +27,7 @@ INCLUDE = [
     "picker/picker.html",
     "picker/picker.js",
     "picker/picker.css",
+    "picker/suppress-resize-observer.js",
     "options/options.html",
     "options/options.js",
     "icons/icon-48.png",
